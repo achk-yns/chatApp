@@ -1,0 +1,12 @@
+export enum StatusCode {
+  OK = 200,
+  ERROR = 500,
+  BAD_REQUEST = 400,
+  CREATED = 201,
+  ACCEPTED = 202,
+  UNAUTHORIZED = 401,
+  NO_CONTENT = 204,
+  FORBIDDEN = 403,
+  NOT_FOUND = 404,
+  CONFLICT = 409,
+}
