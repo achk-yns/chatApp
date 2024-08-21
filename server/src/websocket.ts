@@ -18,35 +18,38 @@ interface UserSocketMap {
 export const initializeWebSocket = (io: SocketIOServer) => {
   const userSocketMap: UserSocketMap = {}; // Initialize the userSocketMap with correct type
 
-  io.on('connection', (socket: Socket) => {
+  io.on('connection', (socket) => {
     console.log('A user is connected', socket.id);
-
-    const userId = socket.handshake.query.userId as string | undefined;
-
-    if (userId && userId !== 'undefined') {
+  
+    const userId = socket.handshake.query.userId as string;
+  
+    if (userId) {
       userSocketMap[userId] = socket.id;
     }
-
+  
     console.log('User socket data', userSocketMap);
-
-    socket.on('disconnect', () => {
-      console.log('User disconnected', socket.id);
-      if (userId) {
-        delete userSocketMap[userId];
-      }
-    });
-
-    socket.on('sendMessage', ({ senderId, receiverId, message }) => {
+  
+    socket.on('sendMessage', async (data) => {
+      const { senderId, receiverId, message } = data;
+      console.log('Received sendMessage event with data:', data);
+  
+      // Emit the message to the receiver if connected
       const receiverSocketId = userSocketMap[receiverId];
-
-      console.log('Receiver Id', receiverId);
-
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit('receiveMessage', {
+        console.log('Emitting newMessage event to the receiver:', receiverId);
+        io.to(receiverSocketId).emit('newMessage', {
           senderId,
+          receiverId,
           message,
         });
+      } else {
+        console.log('Receiver socket ID not found for user:', receiverId);
       }
+    });
+  
+    socket.on('disconnect', () => {
+      console.log('User disconnected', socket.id);
+      delete userSocketMap[userId];
     });
   });
 };

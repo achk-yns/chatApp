@@ -1,13 +1,23 @@
 import { Router } from 'express';
-import { createMessage, getMessagesForConversation } from '../controllers/messageController';
+import { createMessage, getMessagesForConversation , SendMessage,getMessages } from '../controllers/messageController';
 import { authMiddleware } from '../middleware/authMiddleware';
+import { Server as SocketIOServer } from 'socket.io';
 
-const router = Router();
 
-// Route to create a new message
-router.post('/', authMiddleware, createMessage);
+export default (io: SocketIOServer, userSocketMap: Record<string, string>) => {
+    const router = Router();
+  
+    // Route to create a new message
+    router.post('/', authMiddleware, createMessage);
 
-// Route to get all messages for a specific conversation
-router.get('/:conversationId', authMiddleware, getMessagesForConversation);
-
-export default router;
+    // Route to get all messages for a specific conversation
+    router.get('/:conversationId', authMiddleware, getMessagesForConversation);
+    
+    
+    router.post('/sendMessage', SendMessage(userSocketMap, io));
+      
+    router.get('/messages',getMessages);
+    
+  
+    return router;
+  };

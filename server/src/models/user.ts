@@ -40,6 +40,7 @@ const UserSchema: Schema = new Schema({
   Role: {
     type: String,
     enum: Object.values(UserRoles),
+    default:UserRoles.CUSTOMER
   },
   status: {
     type: Number,

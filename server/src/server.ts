@@ -21,9 +21,11 @@ const io = new SocketIOServer(server, {
 app.use(cors());
 app.use(express.json());
 
+const userSocketMap: Record<string, string> = {};
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/message', messageRoutes); // Message routes
+app.use('/api/message', messageRoutes(io, userSocketMap)); // Message routes
+
 
 // Initialize WebSocket
 initializeWebSocket(io);
@@ -34,3 +36,5 @@ server.listen(PORT, async () => {
   await connectDatabase();
   console.log(`Server is running at http://localhost:${PORT}`);
 });
+
+export { app ,server }; 
